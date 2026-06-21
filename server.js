@@ -13,13 +13,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const rooms = {};
 
+// Расширенный список локаций (более 50 мест)
 const DEFAULT_LOCATIONS = [
   'Аэропорт', 'Пляж', 'Подводная лодка', 'Банк', 'Казино',
   'Цирк', 'Посольство', 'Больница', 'Военная база', 'Музей',
   'Ночной клуб', 'Полицейский участок', 'Ресторан', 'Школа',
   'Космическая станция', 'Корабль', 'Поезд', 'Супермаркет',
-  'Университет', 'Кинотеатр', 'Замок', 'Тюрьма',
-  'Яхта', 'Отель', 'Театр'
+  'Университет', 'Кинотеатр', 'Замок', 'Тюрьма', 'Яхта', 
+  'Отель', 'Театр', 'Овощебаза', 'Офис Илона Маска', 'Остров Черепа',
+  'Бункер', 'Деревня ниндзя', 'Заброшенная психбольница', 'Пиратский корабль',
+  'Стриптиз-клуб', 'Очередь за айфоном', 'Психушка', 'Похоронное бюро',
+  'Лаборатория', 'Метро', 'Канализация', 'Кошачий приют', 'Свадьба',
+  'Похороны', 'Цыганский табор', 'Баня', 'Фабрика игрушек', 'Марс',
+  'Торговый центр', 'Горнолыжный курорт', 'Парикмахерская', 'Автосервис',
+  'Рынок', 'Стадион', 'Библиотека', 'Завод по производству мемов'
 ];
 
 function generateRoomCode() {
@@ -60,11 +67,34 @@ io.on('connection', (socket) => {
   socket.on('joinRoom', ({ code, playerName }) => {
     const room = rooms[code];
     if (!room) return socket.emit('error', 'Комната не найдена');
+    
+    // ФИКС БАГА ПЕРЕЗАХОДА: Ищем, нет ли уже игрока с таким именем
+    const existingPlayer = room.players.find(p => p.name === playerName);
+
+    if (existingPlayer) {
+      // Если игра в лобби, просто обновляем ID сокета для этого игрока
+      if (room.state === 'lobby') {
+        existingPlayer.id = socket.id;
+        if (room.host === existingPlayer.id) {
+          room.host = socket.id; // Если это был хост, обновляем хоста
+        }
+      } else {
+        // Если игра уже идет, разрешаем вернуться на свое место!
+        existingPlayer.id = socket.id;
+      }
+      
+      socket.join(code);
+      socket.roomCode = code;
+      socket.playerName = playerName;
+      
+      socket.emit('roomJoined', { code, room: sanitizeRoom(room) });
+      io.to(code).emit('playerJoined', { room: sanitizeRoom(room) });
+      return;
+    }
+
     if (room.state !== 'lobby') return socket.emit('error', 'Игра уже началась');
     if (room.players.length >= room.settings.maxPlayers)
       return socket.emit('error', 'Комната заполнена');
-    if (room.players.find(p => p.name === playerName))
-      return socket.emit('error', 'Имя уже занято');
 
     room.players.push({ id: socket.id, name: playerName, ready: false });
     socket.join(code);
@@ -104,7 +134,7 @@ io.on('connection', (socket) => {
     room.startTime = Date.now();
     room.votes = {};
 
-    // Send individual roles
+    // Рассылка ролей
     room.players.forEach(player => {
       const isSpy = spyIds.includes(player.id);
       io.to(player.id).emit('gameStarted', {
@@ -113,12 +143,13 @@ io.on('connection', (socket) => {
         spyCount,
         players: room.players.map(p => p.name),
         duration: room.settings.duration,
-        locations: isSpy ? room.locations : null
+        locations: null // УБРАНО: Шпион больше не видит список локаций игры
       });
     });
 
-    // Timer countdown
+    // Таймер
     let timeLeft = room.settings.duration * 60;
+    clearInterval(room.timer);
     room.timer = setInterval(() => {
       timeLeft--;
       io.to(socket.roomCode).emit('timerTick', { timeLeft });
@@ -149,6 +180,7 @@ io.on('connection', (socket) => {
     if (!room) return;
     room.votes[socket.id] = { targetName, vote };
     const totalVotes = Object.keys(room.votes).length;
+    
     if (totalVotes >= room.players.length) {
       const guilty = Object.values(room.votes).filter(v => v.vote === 'guilty').length;
       const innocent = Object.values(room.votes).filter(v => v.vote === 'innocent').length;
@@ -180,20 +212,30 @@ io.on('connection', (socket) => {
     const room = rooms[code];
     if (!room) return;
 
-    room.players = room.players.filter(p => p.id !== socket.id);
+    // Даем небольшую задержку перед полным удалением игрока на случай мгновенного реконнекта
+    setTimeout(() => {
+      const updatedRoom = rooms[code];
+      if (!updatedRoom) return;
 
-    if (room.players.length === 0) {
-      clearInterval(room.timer);
-      delete rooms[code];
-      return;
-    }
+      // Проверяем, действительно ли сокет отвалился и не переподключился под новым id
+      const pIndex = updatedRoom.players.findIndex(p => p.name === socket.playerName && p.id === socket.id);
+      if (pIndex !== -1) {
+        updatedRoom.players.splice(pIndex, 1);
 
-    if (room.host === socket.id) {
-      room.host = room.players[0].id;
-      io.to(room.players[0].id).emit('youAreHost');
-    }
+        if (updatedRoom.players.length === 0) {
+          clearInterval(updatedRoom.timer);
+          delete rooms[code];
+          return;
+        }
 
-    io.to(code).emit('playerLeft', { playerName: socket.playerName, room: sanitizeRoom(room) });
+        if (updatedRoom.host === socket.id) {
+          updatedRoom.host = updatedRoom.players[0].id;
+          io.to(updatedRoom.players[0].id).emit('youAreHost');
+        }
+
+        io.to(code).emit('playerLeft', { playerName: socket.playerName, room: sanitizeRoom(updatedRoom) });
+      }
+    }, 1500); // 1.5 секунды буфер на переподключение
   });
 });
 
