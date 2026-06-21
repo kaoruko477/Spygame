@@ -17,6 +17,9 @@
     --muted: #555;
     --spy: #ff3b3b;
     --civ: #c8ff00;
+    /* Новые неоновые цвета для кнопок */
+    --neon-exit: #ff0055;
+    --neon-restart: #00ffcc;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,7 +35,6 @@
     overflow-x: hidden;
   }
 
-  /* Scanline overlay */
   body::before {
     content: '';
     position: fixed;
@@ -70,7 +72,6 @@
   .screen { display: none; }
   .screen.active { display: block; }
 
-  /* ── Cards ── */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -86,7 +87,6 @@
     margin-bottom: 20px;
   }
 
-  /* ── Inputs ── */
   .field { margin-bottom: 16px; }
   .field label {
     display: block;
@@ -112,7 +112,6 @@
 
   input:focus, select:focus { border-color: var(--accent); }
 
-  /* ── Buttons ── */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -143,9 +142,38 @@
   }
   .btn-danger:hover { background: #ff5555; }
 
+  /* Сверх-яркая неоновая кнопка выхода */
+  .btn-bright-exit {
+    background: transparent;
+    color: var(--neon-exit);
+    border: 2px solid var(--neon-exit);
+    box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+    width: 100%;
+    font-weight: bold;
+  }
+  .btn-bright-exit:hover { 
+    background: var(--neon-exit); 
+    color: #000; 
+    box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+  }
+
+  /* Сверх-яркая неоновая кнопка перезапуска */
+  .btn-bright-restart {
+    background: #00ffcc;
+    color: #000;
+    box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+    width: 100%;
+    font-weight: bold;
+  }
+  .btn-bright-restart:hover { 
+    background: #26ffda; 
+    box-shadow: 0 0 25px rgba(0, 255, 204, 0.8);
+    transform: translateY(-1px);
+  }
+
   .btn-ghost {
     background: transparent;
-    color: var(--muted);
+    color: var(--text);
     border: 1px solid var(--border);
     width: 100%;
   }
@@ -159,7 +187,6 @@
 
   .btn + .btn { margin-top: 8px; }
 
-  /* ── Divider ── */
   .divider {
     display: flex;
     align-items: center;
@@ -173,7 +200,6 @@
     content: ''; flex: 1; height: 1px; background: var(--border);
   }
 
-  /* ── Room code ── */
   .room-code {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 3.5rem;
@@ -194,7 +220,6 @@
     margin-bottom: 16px;
   }
 
-  /* ── Player list ── */
   .players-list { list-style: none; }
   .players-list li {
     display: flex;
@@ -221,7 +246,6 @@
     letter-spacing: 0.05em;
   }
 
-  /* ── Settings sliders ── */
   .setting-row {
     display: flex;
     align-items: center;
@@ -259,7 +283,6 @@
   }
   .step-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Role card ── */
   .role-reveal {
     text-align: center;
     padding: 40px 20px;
@@ -302,7 +325,6 @@
     color: var(--text);
   }
 
-  /* ── Timer ── */
   .timer-display {
     text-align: center;
     margin: 20px 0;
@@ -318,7 +340,6 @@
   .timer-value.urgent { color: var(--accent2); animation: pulse 1s infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
-  /* ── Locations editor ── */
   .locations-grid {
     display: flex;
     flex-wrap: wrap;
@@ -350,19 +371,19 @@
   }
   .loc-add-row input { flex: 1; }
 
-  /* ── Vote panel ── */
   .vote-section {
     background: var(--bg);
-    border: 1px solid var(--accent2);
+    border: 1px solid #ff0055;
     padding: 20px;
     margin: 16px 0;
+    box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
     animation: slideIn 0.3s ease;
   }
   @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   .vote-title {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 1.3rem;
-    color: var(--accent2);
+    color: #ff0055;
     letter-spacing: 0.1em;
     margin-bottom: 12px;
   }
@@ -375,7 +396,18 @@
   .vote-btns { display: flex; gap: 8px; }
   .vote-btns .btn { flex: 1; }
 
-  /* ── Notification ── */
+  /* Блок результатов голосования на игровом экране */
+  .vote-result-box {
+    background: #111;
+    border: 1px solid var(--accent);
+    padding: 15px;
+    margin: 12px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: #fff;
+    text-align: center;
+  }
+
   .notif {
     position: fixed;
     bottom: 24px;
@@ -393,7 +425,6 @@
   }
   @keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } }
 
-  /* ── End screen ── */
   .end-reveal { text-align: center; padding: 32px 0; }
   .end-icon { font-size: 3rem; margin-bottom: 16px; }
   .end-title {
@@ -416,7 +447,6 @@
     letter-spacing: 0.05em;
   }
 
-  /* ── Tabs ── */
   .tabs {
     display: flex;
     border-bottom: 1px solid var(--border);
@@ -435,7 +465,6 @@
   }
   .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-  /* ── Vote selector ── */
   .vote-player-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
   .vote-player-btn {
     padding: 6px 14px;
@@ -449,26 +478,6 @@
   }
   .vote-player-btn:hover { border-color: var(--accent2); color: var(--accent2); }
   .vote-player-btn.selected { background: var(--accent2); color: #fff; border-color: var(--accent2); }
-
-  /* Locations list hint */
-  .spy-locations {
-    text-align: left;
-    margin-top: 16px;
-  }
-  .spy-locations .location-label { margin-bottom: 10px; }
-  .spy-locations-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .spy-loc-item {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.72rem;
-    color: var(--muted);
-  }
 
   .hidden { display: none !important; }
 
@@ -488,7 +497,6 @@
 
 <main>
 
-  <!-- HOME -->
   <div class="screen active" id="screen-home">
     <div class="card">
       <div class="card-title">Начать игру</div>
@@ -506,7 +514,6 @@
     </div>
   </div>
 
-  <!-- LOBBY -->
   <div class="screen" id="screen-lobby">
     <div class="card">
       <div class="card-title">Код комнаты</div>
@@ -519,13 +526,11 @@
         <div class="tab" onclick="switchTab('locations')">Места</div>
       </div>
 
-      <!-- Players tab -->
       <div id="tab-players">
         <div class="card-title">Игроки</div>
         <ul class="players-list" id="lobby-players"></ul>
       </div>
 
-      <!-- Settings tab (host only) -->
       <div id="tab-settings" class="hidden">
         <div class="card-title">Настройки</div>
         <div class="setting-row">
@@ -554,7 +559,6 @@
         </div>
       </div>
 
-      <!-- Locations tab -->
       <div id="tab-locations" class="hidden">
         <div class="card-title">Список мест</div>
         <div class="locations-grid" id="locations-grid"></div>
@@ -566,12 +570,11 @@
 
       <div style="margin-top: 20px;">
         <button class="btn btn-primary" id="start-btn" onclick="startGame()">Начать игру</button>
-        <button class="btn btn-ghost" style="margin-top:8px" onclick="goHome()">Выйти</button>
+        <button class="btn btn-bright-exit" style="margin-top:8px" onclick="goHome()">Выйти из комнаты</button>
       </div>
     </div>
   </div>
 
-  <!-- GAME -->
   <div class="screen" id="screen-game">
     <div class="card">
       <div class="role-reveal" id="role-reveal">
@@ -582,11 +585,7 @@
           <div class="location-label">📍 Место встречи</div>
           <div class="location-name" id="location-name"></div>
         </div>
-        <div class="spy-locations hidden" id="spy-locations-box">
-          <div class="location-label">🗺 Возможные места</div>
-          <div class="spy-locations-grid" id="spy-locations-list"></div>
         </div>
-      </div>
     </div>
 
     <div class="card">
@@ -595,6 +594,8 @@
         <div class="timer-value" id="timer-display">00:00</div>
       </div>
     </div>
+
+    <div id="vote-result-panel" class="vote-result-box hidden"></div>
 
     <div class="card" id="vote-call-card">
       <div class="card-title">Действия</div>
@@ -613,11 +614,10 @@
     </div>
 
     <div class="card" id="host-controls" style="display:none;">
-      <button class="btn btn-danger" onclick="endGame()">Завершить игру</button>
+      <button class="btn btn-bright-exit" onclick="endGame()">Завершить игру</button>
     </div>
   </div>
 
-  <!-- END -->
   <div class="screen" id="screen-end">
     <div class="card">
       <div class="end-reveal">
@@ -630,8 +630,8 @@
           <div class="location-name" id="end-location" style="margin-top:6px;"></div>
         </div>
       </div>
-      <button class="btn btn-primary" id="restart-btn" onclick="restartGame()" style="display:none;">Новая игра (та же комната)</button>
-      <button class="btn btn-ghost" onclick="goHome()">На главную</button>
+      <button class="btn btn-bright-restart" id="restart-btn" onclick="restartGame()" style="display:none;">Новая игра (Та же комната)</button>
+      <button class="btn btn-bright-exit" style="margin-top: 12px;" onclick="goHome()">На главную</button>
     </div>
   </div>
 
@@ -651,7 +651,6 @@ let currentSettings = { maxPlayers: 8, spyCount: 1, duration: 8 };
 let currentLocations = [];
 let currentPlayers = [];
 
-// ── Screens ──
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
@@ -666,7 +665,6 @@ function switchTab(tab) {
   document.getElementById('tab-locations').classList.toggle('hidden', tab !== 'locations');
 }
 
-// ── Home actions ──
 function createRoom() {
   const name = document.getElementById('home-name').value.trim();
   if (!name) return notify('Введите имя');
@@ -689,7 +687,6 @@ function goHome() {
   showScreen('home');
 }
 
-// ── Lobby ──
 function renderLobby(room) {
   myRoom = room.code;
   isHost = room.host === socket.id;
@@ -699,7 +696,6 @@ function renderLobby(room) {
 
   document.getElementById('lobby-code').textContent = room.code;
 
-  // Players
   const ul = document.getElementById('lobby-players');
   ul.innerHTML = room.players.map(p => `
     <li>
@@ -709,17 +705,13 @@ function renderLobby(room) {
     </li>
   `).join('');
 
-  // Settings (host only editable)
   updateSettingDisplay();
-
-  // Start button (host only)
   document.getElementById('start-btn').style.display = isHost ? '' : 'none';
-
-  // Locations
   renderLocations();
-
-  // Show/hide loc add for host
   document.getElementById('loc-add-row').classList.toggle('hidden', !isHost);
+
+  // Сбрасываем панель голосования при входе в лобби
+  document.getElementById('vote-result-panel').classList.add('hidden');
 
   showScreen('lobby');
 }
@@ -779,7 +771,6 @@ function startGame() {
   socket.emit('startGame');
 }
 
-// ── Game ──
 function renderGame(data) {
   myRole = data.role;
   const isSpy = data.role === 'spy';
@@ -789,16 +780,11 @@ function renderGame(data) {
   document.getElementById('role-title').className = 'role-title ' + (isSpy ? 'spy' : 'civ');
 
   document.getElementById('location-box').classList.toggle('hidden', isSpy);
-  document.getElementById('spy-locations-box').classList.toggle('hidden', !isSpy);
 
   if (!isSpy) {
     document.getElementById('location-name').textContent = data.location;
-  } else {
-    const grid = document.getElementById('spy-locations-list');
-    grid.innerHTML = (data.locations || []).map(l => `<div class="spy-loc-item">${escHtml(l)}</div>`).join('');
   }
 
-  // Players vote list
   const vl = document.getElementById('vote-player-list');
   vl.innerHTML = data.players.map(name => {
     if (name === myName) return '';
@@ -810,6 +796,7 @@ function renderGame(data) {
   hasVoted = false;
   selectedVoteTarget = null;
   document.getElementById('vote-section').classList.add('hidden');
+  document.getElementById('vote-call-btn').disabled = true;
 
   setTimer(data.duration * 60);
   showScreen('game');
@@ -849,30 +836,22 @@ function castVote(v) {
 }
 
 function endGame() { socket.emit('endGame'); }
-
-function restartGame() {
-  socket.emit('restartGame');
-}
+function restartGame() { socket.emit('restartGame'); }
 
 // ── Socket events ──
-socket.on('roomCreated', ({ code, room }) => {
-  renderLobby(room);
-});
-
-socket.on('roomJoined', ({ room }) => {
-  renderLobby(room);
-});
+socket.on('roomCreated', ({ code, room }) => { renderLobby(room); });
+socket.on('roomJoined', ({ room }) => { renderLobby(room); });
 
 socket.on('playerJoined', ({ room }) => {
   currentPlayers = room.players;
   renderLobby(room);
-  notify(room.players[room.players.length - 1].name + ' присоединился');
+  notify(room.players[room.players.length - 1].name + ' в игре!');
 });
 
 socket.on('playerLeft', ({ playerName, room }) => {
   currentPlayers = room.players;
   renderLobby(room);
-  notify(playerName + ' вышел из игры');
+  notify(playerName + ' покинул лобби');
 });
 
 socket.on('youAreHost', () => {
@@ -891,13 +870,8 @@ socket.on('locationsUpdated', ({ locations }) => {
   renderLocations();
 });
 
-socket.on('gameStarted', (data) => {
-  renderGame(data);
-});
-
-socket.on('timerTick', ({ timeLeft }) => {
-  renderTimer(timeLeft);
-});
+socket.on('gameStarted', (data) => { renderGame(data); });
+socket.on('timerTick', ({ timeLeft }) => { renderTimer(timeLeft); });
 
 socket.on('voteStarted', ({ callerName, targetName, players }) => {
   const vs = document.getElementById('vote-section');
@@ -918,9 +892,16 @@ socket.on('voteProgress', ({ voted, total }) => {
   document.getElementById('vote-progress').textContent = `Проголосовали: ${voted} / ${total}`;
 });
 
+// УЛУЧШЕННОЕ ГОЛОСОВАНИЕ: Выводим результат в специальный плавающий блок, чтобы его видели все
 socket.on('voteResult', ({ targetName, guilty, innocent, total }) => {
   document.getElementById('vote-section').classList.add('hidden');
-  notify(`Голосование: ${targetName} — виновен ${guilty}, невиновен ${innocent}`);
+  
+  const resultPanel = document.getElementById('vote-result-panel');
+  resultPanel.innerHTML = `
+    <strong>Итоги голосования за ${escHtml(targetName)}:</strong><br>
+    🟩 За невиновность: ${innocent} | 🟥 За виновность: ${guilty} (Всего: ${total})
+  `;
+  resultPanel.classList.remove('hidden');
 });
 
 socket.on('timeUp', ({ location, spies }) => {
@@ -934,12 +915,11 @@ socket.on('timeUp', ({ location, spies }) => {
 socket.on('gameRestarted', ({ room }) => {
   clearInterval(timerInterval);
   renderLobby(room);
-  notify('Игра сброшена. Можно начинать заново!');
+  notify('Игра сброшена. Погнали заново!');
 });
 
 socket.on('error', (msg) => notify('❌ ' + msg));
 
-// ── Utilities ──
 function notify(msg) {
   const old = document.querySelector('.notif');
   if (old) old.remove();
@@ -954,7 +934,6 @@ function escHtml(str) {
   return String(str).replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
 }
 
-// Enter key on home
 document.getElementById('home-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') createRoom();
 });
